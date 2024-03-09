@@ -2,6 +2,7 @@ import json
 import re
 import subprocess
 import time
+import warnings
 from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
@@ -137,12 +138,15 @@ class ScriptBrowserEnv(Env[dict[str, Observation], Action]):
 
     @beartype
     def setup(self, config_file: Path | None = None) -> None:
-        self.context_manager = sync_playwright()
-        self.playwright = self.context_manager.__enter__()
-        self.browser = self.playwright.chromium.launch(
-            headless=self.headless, slow_mo=self.slow_mo
-        )
-
+        try:
+            self.context_manager = sync_playwright()
+            self.playwright = self.context_manager.__enter__()
+            self.browser = self.playwright.chromium.launch(
+                headless=self.headless, 
+                slow_mo=self.slow_mo
+            )
+        except Exception as e:
+            raise f("Error setting up playwright browser: {e}")
         if config_file:
             with open(config_file, "r") as f:
                 instance_config = json.load(f)
@@ -158,7 +162,6 @@ class ScriptBrowserEnv(Env[dict[str, Observation], Action]):
                     f"{CLASSIFIEDS}/index.php?page=reset",
                     data={"token": CLASSIFIEDS_RESET_TOKEN},
                 )
-
                 # Check if the request was successful
                 if response.status_code == 200:
                     print("Reset Classifieds site.")
@@ -168,6 +171,7 @@ class ScriptBrowserEnv(Env[dict[str, Observation], Action]):
                         response.status_code,
                     )
             else:
+                # Not Classifieds
                 print(
                     "WARNING: Reset is not supported for this site. Please manually reset the site."
                 )
@@ -180,7 +184,7 @@ class ScriptBrowserEnv(Env[dict[str, Observation], Action]):
         viewport_size = self.viewport_size.copy()
         viewport_size.update(instance_config.get("viewport_size", {}))
         self.observation_handler.viewport_size = viewport_size
-
+        # Problematic with API ptoentailly
         self.context = self.browser.new_context(
             viewport=viewport_size,
             storage_state=storage_state,
@@ -253,7 +257,9 @@ class ScriptBrowserEnv(Env[dict[str, Observation], Action]):
             if config_file.exists():
                 self.setup(config_file=config_file)
             else:
-                raise ValueError(f"Config file {config_file} does not exist.")
+                warnings.warn(f"Config file:{config_file} not found.") 
+                raise ValueError(
+                    f"Config file {config_file} does not exist.")
         else:
             self.setup()
         self.reset_finished = True

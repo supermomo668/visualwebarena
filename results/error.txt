@@ -1,0 +1,33 @@
+[Config file]: config_files/test_classifieds/0.json
+[Unhandled Error] FileNotFoundError(2, 'No such file or directory')
+Traceback (most recent call last):
+  File "/home/opadmin/llama2d_opentable/visualwebarena/run.py", line 351, in test
+    obs, info = env.reset(
+                ^^^^^^^^^^
+  File "<@beartype(browser_env.envs.ScriptBrowserEnv.reset) at 0x7fda7c63e020>", line 51, in reset
+  File "/home/opadmin/llama2d_opentable/visualwebarena/browser_env/envs.py", line 258, in reset
+    self.setup(config_file=config_file)
+  File "<@beartype(browser_env.envs.ScriptBrowserEnv.setup) at 0x7fda7c63d580>", line 36, in setup
+  File "/home/opadmin/llama2d_opentable/visualwebarena/browser_env/envs.py", line 188, in setup
+    self.context = self.browser.new_context(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/opadmin/anaconda3/envs/llama2d/lib/python3.11/site-packages/playwright/sync_api/_generated.py", line 14236, in new_context
+    self._sync(
+  File "/home/opadmin/anaconda3/envs/llama2d/lib/python3.11/site-packages/playwright/_impl/_sync_base.py", line 109, in _sync
+    return task.result()
+           ^^^^^^^^^^^^^
+  File "/home/opadmin/anaconda3/envs/llama2d/lib/python3.11/site-packages/playwright/_impl/_browser.py", line 127, in new_context
+    await prepare_browser_context_params(params)
+  File "/home/opadmin/anaconda3/envs/llama2d/lib/python3.11/site-packages/playwright/_impl/_browser.py", line 249, in prepare_browser_context_params
+    (await async_readfile(storageState)).decode()
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/opadmin/anaconda3/envs/llama2d/lib/python3.11/site-packages/playwright/_impl/_helper.py", line 364, in async_readfile
+    return await loop.run_in_executor(None, inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/opadmin/anaconda3/envs/llama2d/lib/python3.11/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/opadmin/anaconda3/envs/llama2d/lib/python3.11/site-packages/playwright/_impl/_helper.py", line 360, in inner
+    with open(file, "rb") as fh:
+         ^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: './.auth/classifieds_state.json'

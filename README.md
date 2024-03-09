@@ -32,6 +32,9 @@ pip install -r requirements.txt
 playwright install
 pip install -e .
 ```
+```
+npx playwright install-deps chromium
+```
 
 You can also run the unit tests to ensure that VisualWebArena is installed correctly:
 ```

@@ -70,58 +70,60 @@ def renew_comb(comb: list[str], auth_folder: str = "./.auth") -> None:
     browser = playwright.chromium.launch(headless=HEADLESS)
     context = browser.new_context()
     page = context.new_page()
+    try:
+        if "shopping" in comb:
+            username = ACCOUNTS["shopping"]["username"]
+            password = ACCOUNTS["shopping"]["password"]
+            page.goto(f"{SHOPPING}/customer/account/login/")
+            page.get_by_label("Email", exact=True).fill(username)
+            page.get_by_label("Password", exact=True).fill(password)
+            page.get_by_role("button", name="Sign In").click()
 
-    if "shopping" in comb:
-        username = ACCOUNTS["shopping"]["username"]
-        password = ACCOUNTS["shopping"]["password"]
-        page.goto(f"{SHOPPING}/customer/account/login/")
-        page.get_by_label("Email", exact=True).fill(username)
-        page.get_by_label("Password", exact=True).fill(password)
-        page.get_by_role("button", name="Sign In").click()
+        if "reddit" in comb:
+            username = ACCOUNTS["reddit"]["username"]
+            password = ACCOUNTS["reddit"]["password"]
+            page.goto(f"{REDDIT}/login")
+            page.get_by_label("Username").fill(username)
+            page.get_by_label("Password").fill(password)
+            page.get_by_role("button", name="Log in").click()
 
-    if "reddit" in comb:
-        username = ACCOUNTS["reddit"]["username"]
-        password = ACCOUNTS["reddit"]["password"]
-        page.goto(f"{REDDIT}/login")
-        page.get_by_label("Username").fill(username)
-        page.get_by_label("Password").fill(password)
-        page.get_by_role("button", name="Log in").click()
+        if "classifieds" in comb:
+            username = ACCOUNTS["classifieds"]["username"]
+            password = ACCOUNTS["classifieds"]["password"]
+            page.goto(f"{CLASSIFIEDS}/index.php?page=login")
+            page.locator("#email").fill(username)
+            page.locator("#password").fill(password)
+            page.get_by_role("button", name="Log in").click()
 
-    if "classifieds" in comb:
-        username = ACCOUNTS["classifieds"]["username"]
-        password = ACCOUNTS["classifieds"]["password"]
-        page.goto(f"{CLASSIFIEDS}/index.php?page=login")
-        page.locator("#email").fill(username)
-        page.locator("#password").fill(password)
-        page.get_by_role("button", name="Log in").click()
+        if "shopping_admin" in comb:
+            username = ACCOUNTS["shopping_admin"]["username"]
+            password = ACCOUNTS["shopping_admin"]["password"]
+            page.goto(f"{SHOPPING_ADMIN}")
+            page.get_by_placeholder("user name").fill(username)
+            page.get_by_placeholder("password").fill(password)
+            page.get_by_role("button", name="Sign in").click()
 
-    if "shopping_admin" in comb:
-        username = ACCOUNTS["shopping_admin"]["username"]
-        password = ACCOUNTS["shopping_admin"]["password"]
-        page.goto(f"{SHOPPING_ADMIN}")
-        page.get_by_placeholder("user name").fill(username)
-        page.get_by_placeholder("password").fill(password)
-        page.get_by_role("button", name="Sign in").click()
-
-    if "gitlab" in comb:
-        username = ACCOUNTS["gitlab"]["username"]
-        password = ACCOUNTS["gitlab"]["password"]
-        page.goto(f"{GITLAB}/users/sign_in")
-        page.get_by_test_id("username-field").click()
-        page.get_by_test_id("username-field").fill(username)
-        page.get_by_test_id("username-field").press("Tab")
-        page.get_by_test_id("password-field").fill(password)
-        page.get_by_test_id("sign-in-button").click()
-
-    context.storage_state(path=f"{auth_folder}/{'.'.join(comb)}_state.json")
-
+        if "gitlab" in comb:
+            username = ACCOUNTS["gitlab"]["username"]
+            password = ACCOUNTS["gitlab"]["password"]
+            page.goto(f"{GITLAB}/users/sign_in")
+            page.get_by_test_id("username-field").click()
+            page.get_by_test_id("username-field").fill(username)
+            page.get_by_test_id("username-field").press("Tab")
+            page.get_by_test_id("password-field").fill(password)
+            page.get_by_test_id("sign-in-button").click()
+    except Exception as e:
+        print(f"Error when navigating pages:\n{e}")
+    store_path = Path(auth_folder)/f"{'.'.join(comb)}_state.json"
+    context.storage_state(store_path)
+    print(f"Browser context failed to be sync to {store_path} ")
     context_manager.__exit__()
 
 
 def main(auth_folder: str = "./.auth") -> None:
     pairs = list(combinations(SITES, 2))
 
-    with ThreadPoolExecutor(max_workers=8) as executor:
+    with ThreadPoolExecutor(max_workers=1) as executor:
         for pair in pairs:
             # Auth doesn't work on this pair as they share the same cookie
             if "reddit" in pair and (
@@ -133,7 +135,8 @@ def main(auth_folder: str = "./.auth") -> None:
             )
 
         for site in SITES:
-            executor.submit(renew_comb, [site], auth_folder=auth_folder)
+            executor.submit(
+                renew_comb, [site], auth_folder=auth_folder)
 
     for c_file in glob.glob(f"{auth_folder}/*.json"):
         comb = c_file.split("/")[-1].rsplit("_", 1)[0].split(".")

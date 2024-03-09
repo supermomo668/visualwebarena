@@ -292,11 +292,11 @@ def test(
         )
 
     agent = construct_agent(
-        args,
-        captioning_fn=caption_image_fn
+        args, captioning_fn=caption_image_fn
         if args.observation_type == "accessibility_tree_with_captioner"
         else None,
-    )  # NOTE: captioning_fn here is used for captioning input images.
+    )  
+    # NOTE: captioning_fn here is used for captioning input images.
 
     env = ScriptBrowserEnv(
         headless=not args.render,
@@ -313,8 +313,9 @@ def test(
         # This can be different from the captioning model used for evals.
         captioning_fn=caption_image_fn,
     )
-
+    logger.info(f"Configuration files:{config_file_list}")
     for config_file in config_file_list:
+        assert Path(config_file).exists(), f"{config_file} doesn't exist"
         try:
             render_helper = RenderHelper(
                 config_file, args.result_dir, args.action_set_tag
@@ -346,8 +347,12 @@ def test(
 
             agent.reset(config_file)
             trajectory: Trajectory = []
-            obs, info = env.reset(options={"config_file": config_file})
-            state_info: StateInfo = {"observation": obs, "info": info}
+            
+            obs, info = env.reset(
+                options={"config_file": config_file})
+            state_info: StateInfo = {
+                "observation": obs, "info": info
+            }
             trajectory.append(state_info)
 
             meta_data = {"action_history": ["None"]}
@@ -496,7 +501,10 @@ if __name__ == "__main__":
     st_idx = args.test_start_idx
     ed_idx = args.test_end_idx
     for i in range(st_idx, ed_idx):
-        test_file_list.append(os.path.join(test_config_base_dir, f"{i}.json"))
+        fn = Path(test_config_base_dir)/f"{i}.json"
+        assert fn.exists(), f"config file {fn} does not exists"
+        test_file_list.append(str(fn))
+        
     test_file_list = get_unfinished(test_file_list, args.result_dir)
     print(f"Total {len(test_file_list)} tasks left")
     args.render = False
@@ -505,5 +513,6 @@ if __name__ == "__main__":
 
     args.current_viewport_only = True
     dump_config(args)
-
+    
+    
     test(args, test_file_list)

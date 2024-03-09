@@ -1,6 +1,10 @@
 # websites domain
 import os
 
+from dotenv import load_dotenv
+
+loaded_envvars = load_dotenv(override=True)
+assert loaded_envvars, "Have not loaded the environment variables"
 # VWA
 REDDIT = os.environ.get("REDDIT", "")
 SHOPPING = os.environ.get("SHOPPING", "")
@@ -15,6 +19,11 @@ SHOPPING_ADMIN = os.environ.get("SHOPPING_ADMIN", "")
 GITLAB = os.environ.get("GITLAB", "")
 MAP = os.environ.get("MAP", "")
 
+
+print(
+    f"Env Var checks:\n{REDDIT}\n{SHOPPING}"
+)
+
 assert (
     REDDIT
     and SHOPPING
@@ -25,13 +34,13 @@ assert (
 #    and REDDIT_RESET_URL
 ), (
     f"Please setup the URLs and tokens to each site. Current: "
-    + f"Reddit: {REDDIT}"
+    + f"Reddit: {REDDIT}\n"
     # + f"  Reddit reset url: {REDDIT_RESET_URL}"
-    + f"Shopping: {SHOPPING}"
-    + f"Wikipedia: {WIKIPEDIA}"
-    + f"Homepage: {HOMEPAGE}"
-    + f"Classifieds: {CLASSIFIEDS}"
-    + f"  Classifieds reset token: {CLASSIFIEDS_RESET_TOKEN}"
+    + f"Shopping: {SHOPPING}\n"
+    + f"Wikipedia: {WIKIPEDIA}\n"
+    + f"Homepage: {HOMEPAGE}\n"
+    + f"Classifieds: {CLASSIFIEDS}\n"
+    + f"  Classifieds reset token: {CLASSIFIEDS_RESET_TOKEN}\n"
 )
 
 
