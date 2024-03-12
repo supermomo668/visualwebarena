@@ -1217,7 +1217,8 @@ class ObservationHandler:
             dtype=np.uint8,
         )
 
-        return spaces.Dict({"text": text_space, "image": image_space})
+        return spaces.Dict({
+            "text": text_space, "image": image_space})
 
     @beartype
     def get_observation(

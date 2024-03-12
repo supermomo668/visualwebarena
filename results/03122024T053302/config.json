@@ -29,6 +29,6 @@
     "max_obs_length": 3840,
     "test_start_idx": 1,
     "test_end_idx": 2,
-    "result_dir": "results",
+    "result_dir": "results/03122024T053302",
     "render_screenshot": true
 }

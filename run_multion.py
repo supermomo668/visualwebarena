@@ -1,6 +1,7 @@
 """Script to run end-to-end evaluation on the benchmark.
 
 Modified from https://github.com/web-arena-x/webarena/blob/main/run.py.
+by Pranav
 """
 import argparse
 import glob
@@ -9,6 +10,7 @@ import logging
 import os
 import random
 import time
+import multion
 from pathlib import Path
 from typing import List
 
@@ -31,12 +33,15 @@ from browser_env import (
     Trajectory,
     create_stop_action,
 )
+# Initialize environment vars & browser environment here
 from browser_env.actions import is_equivalent
 from browser_env.helper_functions import (
     RenderHelper,
     get_action_description,
 )
-from evaluation_harness import evaluator_router, image_utils
+from evaluation_harness import image_utils
+from evaluation_harness.multion_evaluators import evaluator_router
+
 
 LOG_FOLDER = "log_files"
 Path(LOG_FOLDER).mkdir(parents=True, exist_ok=True)
@@ -57,6 +62,10 @@ logger.addHandler(file_handler)
 formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
 console_handler.setFormatter(formatter)
 file_handler.setFormatter(formatter)
+
+multion_api_key = os.getenv('MULTION_API_KEY')
+multion.login(use_api=True, multion_api_key=multion_api_key)
+multion.set_remote(True)
 
 
 def config() -> argparse.Namespace:
@@ -120,7 +129,7 @@ def config() -> argparse.Namespace:
         default=5,
     )
 
-    parser.add_argument("--test_config_base_dir", type=str)
+    parser.add_argument("--test_config_base_dir", type=str, default="configs/experiment/tests")
 
     parser.add_argument(
         "--eval_captioning_model_device",
@@ -169,11 +178,9 @@ def config() -> argparse.Namespace:
     # example config
     parser.add_argument("--test_start_idx", type=int, default=0)
     parser.add_argument("--test_end_idx", type=int, default=910)
-    from datetime import datetime
-    timestr = datetime.now().strftime("%m%d%YT%H%M%S")
 
     # logging related
-    parser.add_argument("--result_dir", type=str, default=f"results/{timestr}")
+    parser.add_argument("--result_dir", type=str, default="")
     args = parser.parse_args()
 
     # check the whether the action space is compatible with the observation space
@@ -294,11 +301,11 @@ def test(
         )
 
     agent = construct_agent(
-        args, captioning_fn=caption_image_fn
+        args,
+        captioning_fn=caption_image_fn
         if args.observation_type == "accessibility_tree_with_captioner"
         else None,
-    )  
-    # NOTE: captioning_fn here is used for captioning input images.
+    )  # NOTE: captioning_fn here is used for captioning input images.
 
     env = ScriptBrowserEnv(
         headless=not args.render,
@@ -315,13 +322,15 @@ def test(
         # This can be different from the captioning model used for evals.
         captioning_fn=caption_image_fn,
     )
-    logger.info(f"Configuration files:{config_file_list}")
+
     for config_file in config_file_list:
-        assert Path(config_file).exists(), f"{config_file} doesn't exist"
+
         try:
             render_helper = RenderHelper(
                 config_file, args.result_dir, args.action_set_tag
+
             )
+            env.reset(options={"config_file": config_file})
 
             # Load task.
             with open(config_file) as f:
@@ -348,71 +357,41 @@ def test(
             logger.info(f"[Intent]: {intent}")
 
             agent.reset(config_file)
+
+            if len(images) != 0:
+                print(f"Images not supported yet. Skipping [{task_id}]")
+
+            url = _c['start_url'].replace("localhost", "ec2-18-117-93-31.us-east-2.compute.amazonaws.com")
+            if not url.startswith('http'):
+                url = 'http://' + url
+            # url = url.replace("localhost", "ec2-18-117-93-31.us-east-2.compute.amazonaws.com")
+            response = multion.create_session({'url': url})
+            responses = []
+            for step in range(args.max_steps):
+                response = multion.step_session(response['session_id'], {'url': url,
+                                                                         'input': intent})
+                responses.append(response)
+
+            # save responses
+            for i, response in enumerate(responses):
+                img_data = requests.get(response['screenshot']).content
+                directory = os.path.join(args.result_dir, 'trajectories', str(task_id))
+                os.makedirs(directory, exist_ok=True)
+                with open(os.path.join(directory, f'{i}.png'), 'wb+') as handler:
+                    handler.write(img_data)
+                with open(os.path.join(directory, f'{i}.json'), 'w+') as f:
+                    json.dump(response, f)
+
             trajectory: Trajectory = []
-            
-            obs, info = env.reset(
-                options={"config_file": config_file})
-            state_info: StateInfo = {
-                "observation": obs, "info": info
-            }
-            trajectory.append(state_info)
-
-            meta_data = {"action_history": ["None"]}
-            while True:
-                early_stop_flag, stop_info = early_stop(
-                    trajectory, max_steps, early_stop_thresholds
-                )
-
-                if early_stop_flag:
-                    action = create_stop_action(f"Early stop: {stop_info}")
-                else:
-                    try:
-                        action = agent.next_action(
-                            trajectory,
-                            intent,
-                            images=images,
-                            meta_data=meta_data,
-                        )
-                    except ValueError as e:
-                        # get the error message
-                        action = create_stop_action(f"ERROR: {str(e)}")
-
-                trajectory.append(action)
-
-                action_str = get_action_description(
-                    action,
-                    state_info["info"]["observation_metadata"],
-                    action_set_tag=args.action_set_tag,
-                    prompt_constructor=agent.prompt_constructor
-                    if isinstance(agent, PromptAgent)
-                    else None,
-                )
-                render_helper.render(
-                    action, state_info, meta_data, args.render_screenshot
-                )
-                meta_data["action_history"].append(action_str)
-
-                if action["action_type"] == ActionTypes.STOP:
-                    break
-
-                obs, _, terminated, _, info = env.step(action)
-                state_info = {"observation": obs, "info": info}
-                trajectory.append(state_info)
-
-                if terminated:
-                    # add a action place holder
-                    trajectory.append(create_stop_action(""))
-                    break
-
-            # NOTE: eval_caption_image_fn is used for running eval_vqa functions.
+                       # NOTE: eval_caption_image_fn is used for running eval_vqa functions.
             evaluator = evaluator_router(
                 config_file, captioning_fn=eval_caption_image_fn
             )
             score = evaluator(
-                trajectory=trajectory,
+                response=response,
                 config_file=config_file,
                 page=env.page,
-                client=env.get_page_client(env.page),
+                client=None,
             )
 
             scores.append(score)
@@ -492,6 +471,7 @@ def dump_config(args: argparse.Namespace) -> None:
 
 
 if __name__ == "__main__":
+    
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
     args = config()
     args.sleep_after_execution = 2.5
@@ -503,10 +483,7 @@ if __name__ == "__main__":
     st_idx = args.test_start_idx
     ed_idx = args.test_end_idx
     for i in range(st_idx, ed_idx):
-        fn = Path(test_config_base_dir)/f"{i}.json"
-        assert fn.exists(), f"config file {fn} does not exists"
-        test_file_list.append(str(fn))
-    # get remaining tasks based on  
+        test_file_list.append(os.path.join(test_config_base_dir, f"{i}.json"))
     test_file_list = get_unfinished(test_file_list, args.result_dir)
     print(f"Total {len(test_file_list)} tasks left")
     args.render = False
@@ -515,6 +492,5 @@ if __name__ == "__main__":
 
     args.current_viewport_only = True
     dump_config(args)
-    
-    
+
     test(args, test_file_list)
