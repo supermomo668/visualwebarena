@@ -1,3 +1,6 @@
+"""
+Main data processing procedure for text and screenshot image prior to sending them to the agent for generating action in the RL environment
+"""
 import json
 import re
 from collections import defaultdict

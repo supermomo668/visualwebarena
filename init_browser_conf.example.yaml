@@ -1,0 +1,19 @@
+visualwebarena:
+  HEADLESS: True
+  SLOW_MO: 0
+
+params:
+  sites:
+    reddit:
+      slug: "reddit"
+      url: "http://example.com/reddit"
+      username: "user_example"
+      password: "pass_example"
+      token: "token_example"
+    shopping:
+      slug: "shopping"
+      url: "http://example.com/shopping"
+      username: "user_example"
+      password: "pass_example"
+      token: ""
+    # Similar structure for other sites with sensitive info hidden or replaced

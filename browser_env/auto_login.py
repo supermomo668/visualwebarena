@@ -3,34 +3,22 @@ import argparse
 import glob
 import os
 import time
+import yaml
+
 from concurrent.futures import ThreadPoolExecutor
 from itertools import combinations
 from pathlib import Path
 
 from playwright.sync_api import sync_playwright
 
-from browser_env.env_config import (
-    ACCOUNTS,
-    CLASSIFIEDS,
-    REDDIT,
-    SHOPPING,
-    OPENTABLE
-)
-
-HEADLESS = True
-SLOW_MO = 0
-
-
-SITES = ["shopping", "reddit", "classifieds", "opentable"]
-URLS = [
-    f"{SHOPPING}/wishlist/",
-    f"{REDDIT}/user/{ACCOUNTS['reddit']['username']}/account",
-    f"{CLASSIFIEDS}/index.php?page=user&action=items",
-    f"{OPENTABLE}/"
-]
-EXACT_MATCH = [True, True, True, True]
-KEYWORDS = ["", "Delete", "My listings", ""]
-
+from browser_env.env_config import config as browse_config
+# (
+#     ACCOUNTS,
+#     CLASSIFIEDS,
+#     REDDIT,
+#     SHOPPING,
+#     OPENTABLE
+# )
 
 def is_expired(
     storage_state: Path, url: str, keyword: str, url_exact: bool = True
@@ -42,7 +30,7 @@ def is_expired(
     context_manager = sync_playwright()
     playwright = context_manager.__enter__()
     browser = playwright.chromium.launch(
-        headless=True, slow_mo=SLOW_MO)
+        headless=browse_config.browse.HEADLESS, slow_mo=browse_config.browse.SLOW_MO)
     context = browser.new_context(storage_state=storage_state)
     page = context.new_page()
     page.goto(url)
@@ -58,38 +46,39 @@ def is_expired(
         else:
             return url not in d_url
 
+def page_handler1(page, url_endpoint, slug):
+    site_config = getattr(browse_config, 'slug')
+    page.goto(url_endpoint, timeout=0)
+    page.get_by_label("Email", exact=True).fill(site_config.username)
+    page.get_by_label("Password", exact=True).fill(site_config.password)
+    page.get_by_role("button", name="Sign In").click()
+
+def page_handler2(page, url_endpoint, slug):
+    site_config = getattr(browse_config, 'slug')
+    page.goto(url_endpoint, timeout=0)
+    page.locator("#email").fill(site_config.username)
+    page.locator("#password").fill(site_config.password)
+    page.get_by_role("button", name="Log in").click()
 
 def renew_comb(comb: list[str]) -> None:
     context_manager = sync_playwright()
     playwright = context_manager.__enter__()
-    browser = playwright.chromium.launch(headless=HEADLESS)
+    browser = playwright.chromium.launch(headless=browse_config.browse.HEADLESS, slow_mo=browse_config.browse.SLOW_MO)
     context = browser.new_context()
     page = context.new_page()
     page.set_default_timeout(0)
-    if "shopping" in comb:
-        username = ACCOUNTS["shopping"]["username"]
-        password = ACCOUNTS["shopping"]["password"]
-        page.goto(
-            f"{SHOPPING}/customer/account/login/", timeout=0)
-        page.get_by_label("Email", exact=True).fill(username)
-        page.get_by_label("Password", exact=True).fill(password)
-        page.get_by_role("button", name="Sign In").click()
+    for site_name in comb:
+        match site_name:
+            case "shopping":
+                page_handler1(
+                    page, "{token}/customer/account/login/", site_name)
+            case "reddit": 
+                page_handler1(
+                    page, "{token}/login", site_name)
 
-    if "reddit" in comb:
-        username = ACCOUNTS["reddit"]["username"]
-        password = ACCOUNTS["reddit"]["password"]
-        page.goto(f"{REDDIT}/login")
-        page.get_by_label("Username").fill(username)
-        page.get_by_label("Password").fill(password)
-        page.get_by_role("button", name="Log in").click()
-
-    if "classifieds" in comb:
-        username = ACCOUNTS["classifieds"]["username"]
-        password = ACCOUNTS["classifieds"]["password"]
-        page.goto(f"{CLASSIFIEDS}/index.php?page=login")
-        page.locator("#email").fill(username)
-        page.locator("#password").fill(password)
-        page.get_by_role("button", name="Log in").click()
+            case "classifieds":
+                page_handler2()
+        
 
     context.storage_state(path=f"./.auth/{'.'.join(comb)}_state.json")
 
@@ -97,17 +86,14 @@ def renew_comb(comb: list[str]) -> None:
 
 
 def main() -> None:
-    for site in SITES:
+    for site in list(browse_config.params.sites.keys()):
         renew_comb([site])
 
     for c_file in glob.glob("./.auth/*.json"):
         comb = c_file.split("/")[-1].rsplit("_", 1)[0].split(".")
         for cur_site in comb:
-            url = URLS[SITES.index(cur_site)]
-            keyword = KEYWORDS[SITES.index(cur_site)]
-            match = EXACT_MATCH[SITES.index(cur_site)]
-            print(c_file, url, keyword, match)
-            assert not is_expired(Path(c_file), url, keyword, match), url
+            site_config = getattr(browse_config, cur_site)
+            assert not is_expired(Path(c_file), site_config.url, site_config.keyword, site_config.match), site_config.url
 
 
 if __name__ == "__main__":

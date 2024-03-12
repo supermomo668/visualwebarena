@@ -23,11 +23,7 @@ from playwright.sync_api import (
     sync_playwright,
 )
 
-from browser_env.env_config import (
-    CLASSIFIEDS,
-    CLASSIFIEDS_RESET_TOKEN,
-    REDDIT_RESET_URL,
-)
+from browser_env.env_config import config as browse_config 
 
 from .actions import Action, execute_action, get_action_space
 from .processors import ObservationHandler, ObservationMetadata
@@ -159,8 +155,8 @@ class ScriptBrowserEnv(Env[dict[str, Observation], Action]):
             if "classifieds" in instance_config["sites"]:
                 # Send POST request to __CLASSIFIEDS__/index.php?page=reset with token=CLASSIFIEDS_TOKEN
                 response = requests.post(
-                    f"{CLASSIFIEDS}/index.php?page=reset",
-                    data={"token": CLASSIFIEDS_RESET_TOKEN},
+                    f"{browse_config.CLASSIFIEDS.token}/index.php?page=reset",
+                    data={"token": browse_config.CLASSIFIEDS.reset_token},
                 )
                 # Check if the request was successful
                 if response.status_code == 200:

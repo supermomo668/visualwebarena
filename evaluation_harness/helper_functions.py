@@ -9,12 +9,11 @@ from beartype import beartype
 from beartype.typing import Dict, List
 from playwright.sync_api import CDPSession, Page
 
-from browser_env.env_config import (
-    ACCOUNTS,
-    REDDIT,
-    SHOPPING,
-    WIKIPEDIA,
-)
+from browser_env.env_config import config as browse_config
+# (
+#     ACCOUNTS,
+#     SHOPPING,
+# )
 from llms.providers.openai_utils import (
     generate_from_openai_chat_completion,
 )
@@ -36,12 +35,12 @@ class PseudoPage:
 @beartype
 def shopping_get_auth_token() -> str:
     response = requests.post(
-        url=f"{SHOPPING}/rest/default/V1/integration/admin/token",
+        url=f"{browse_config.params.sites.SHOPPING.token}/rest/default/V1/integration/admin/token",
         headers={"content-type": "application/json"},
         data=json.dumps(
             {
-                "username": ACCOUNTS["shopping_site_admin"]["username"],
-                "password": ACCOUNTS["shopping_site_admin"]["password"],
+                "username": browse_config.params.sites.SHOPPING_ADMIN.username,
+                "password": browse_config.params.sites.SHOPPING_ADMIN.password,
             }
         ),
     )
@@ -65,12 +64,12 @@ def shopping_get_latest_order_url() -> str:
     }
 
     response = requests.get(
-        f"{SHOPPING}/rest/V1/orders", params=params, headers=header
+        f"{browse_config.params.sites.SHOPPING.token}/rest/V1/orders", params=params, headers=header
     )
     assert response.status_code == 200
     response_obj = response.json()["items"][0]
     order_id = int(response_obj["increment_id"])
-    order_url = f"{SHOPPING}/sales/order/view/order_id/{order_id}/"
+    order_url = f"{browse_config.params.sites.SHOPPING.token}/sales/order/view/order_id/{order_id}/"
     return order_url
 
 
@@ -82,7 +81,7 @@ def shopping_get_sku_latest_review_author(sku: str) -> str:
         "Content-Type": "application/json",
     }
     response = requests.get(
-        f"{SHOPPING}/rest/V1/products/{sku}/reviews", headers=header
+        f"{browse_config.params.sites.SHOPPING.token}/rest/V1/products/{sku}/reviews", headers=header
     )
     assert response.status_code == 200
     response_obj = response.json()

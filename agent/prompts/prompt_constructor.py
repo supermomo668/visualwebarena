@@ -5,12 +5,15 @@ from typing import Any, TypedDict
 from PIL import Image
 
 from browser_env import Action, ActionParsingError, Trajectory
-from browser_env.env_config import URL_MAPPINGS
+from browser_env.env_config import config as browse_config
 from browser_env.utils import StateInfo, pil_to_b64, pil_to_vertex
 from llms import lm_config
 from llms.tokenizers import Tokenizer
 from llms.utils import APIInput
 
+URL_MAPPINGS = {}
+for name, site_config in browse_config.params.sites.items():
+    URL_MAPPINGS.update({name: site_config.url})
 
 class Instruction(TypedDict):
     """Instruction for constructing prompt"""
@@ -60,7 +63,9 @@ class PromptConstructor(object):
                             "content": y,
                         }
                     )
-                message.append({"role": "user", "content": current})
+                message.append(
+                    {"role": "user", "content": current}
+                )
                 return message
             elif self.lm_config.mode == "completion":
                 message = f"{intro}\n\n"
@@ -122,7 +127,9 @@ class PromptConstructor(object):
 
     def map_url_to_real(self, url: str) -> str:
         """Map the urls to their real world counterparts"""
+        
         for i, j in URL_MAPPINGS.items():
+            # i is site name
             if i in url:
                 url = url.replace(i, j)
         return url
@@ -130,6 +137,7 @@ class PromptConstructor(object):
     def map_url_to_local(self, url: str) -> str:
         """Map the urls to their local counterparts"""
         for i, j in URL_MAPPINGS.items():
+            # j is the start url
             if j in url:
                 url = url.replace(j, i)
             # https
