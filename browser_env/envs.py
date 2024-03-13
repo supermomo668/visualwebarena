@@ -26,7 +26,7 @@ from playwright.sync_api import (
 from browser_env.env_config import config as browse_config 
 
 from .actions import Action, execute_action, get_action_space
-from .processors import ObservationHandler, ObservationMetadata
+from .processors.base import ObservationHandler, ObservationMetadata
 from .utils import (
     AccessibilityTree,
     DetachedPage,

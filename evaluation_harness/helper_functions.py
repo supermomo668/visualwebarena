@@ -10,10 +10,7 @@ from beartype.typing import Dict, List
 from playwright.sync_api import CDPSession, Page
 
 from browser_env.env_config import config as browse_config
-# (
-#     ACCOUNTS,
-#     SHOPPING,
-# )
+
 from llms.providers.openai_utils import (
     generate_from_openai_chat_completion,
 )
@@ -99,7 +96,7 @@ def shopping_get_sku_latest_review_rating(sku: str) -> str:
         "Content-Type": "application/json",
     }
     response = requests.get(
-        f"{SHOPPING}/rest/V1/products/{sku}/reviews", headers=header
+        f"{browse_config.params.sites.SHOPPING.token}/rest/V1/products/{sku}/reviews", headers=header
     )
     assert response.status_code == 200
     response_obj = response.json()
@@ -118,7 +115,7 @@ def shopping_get_sku_latest_review_text(sku: str) -> str:
         "Content-Type": "application/json",
     }
     response = requests.get(
-        f"{SHOPPING}/rest/V1/products/{sku}/reviews", headers=header
+        f"{browse_config.params.sites.SHOPPING.token}/rest/V1/products/{sku}/reviews", headers=header
     )
     assert response.status_code == 200
     response_obj = response.json()
@@ -136,7 +133,7 @@ def shopping_get_sku_latest_review_title(sku: str) -> str:
         "Content-Type": "application/json",
     }
     response = requests.get(
-        f"{SHOPPING}/rest/V1/products/{sku}/reviews", headers=header
+        f"{browse_config.params.sites.SHOPPING.token}/rest/V1/products/{sku}/reviews", headers=header
     )
     assert response.status_code == 200
     response_obj = response.json()
@@ -154,7 +151,7 @@ def shopping_get_sku_product_page_url(sku: str) -> str:
         "Content-Type": "application/json",
     }
     response = requests.get(
-        f"{SHOPPING}/rest/V1/products/{sku}", headers=header
+        f"{browse_config.params.sites.SHOPPING.token}/rest/V1/products/{sku}", headers=header
     )
     assert response.status_code == 200
     response_obj = response.json()
@@ -162,7 +159,7 @@ def shopping_get_sku_product_page_url(sku: str) -> str:
         return ""
     for custom_attributes in response_obj["custom_attributes"]:
         if custom_attributes["attribute_code"] == "url_key":
-            return f"{SHOPPING}/{custom_attributes['value']}.html"
+            return f"{browse_config.params.sites.SHOPPING.token}/{custom_attributes['value']}.html"
     return ""
 
 

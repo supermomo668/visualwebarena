@@ -40,7 +40,7 @@ from browser_env.constants import (
     URL_MAX_LENGTH,
     RolesType,
 )
-from browser_env.processors import ObservationProcessor
+from browser_env.processors.base import ObservationProcessor
 
 
 class ParsedPlaywrightCode(TypedDict):
@@ -49,10 +49,8 @@ class ParsedPlaywrightCode(TypedDict):
     keywords: dict[str, Any]
 
 
-from browser_env.processors import (
-    ObservationProcessor,
-    TextObervationProcessor,
-)
+from browser_env.processors.base import ObservationProcessor
+from browser_env.processors.text import TextObervationProcessor
 
 
 @beartype

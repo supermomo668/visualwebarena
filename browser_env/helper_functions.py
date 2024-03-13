@@ -41,7 +41,9 @@ def get_render_action(
     observation_metadata: dict[str, ObservationMetadata],
     action_set_tag: str,
 ) -> str:
-    """Parse the predicted actions for rendering purpose. More comprehensive information"""
+    """
+    Parse the predicted actions for rendering purpose. More comprehensive information
+    """
     match action_set_tag:
         case "id_accessibility_tree":
             text_meta_data = observation_metadata["text"]

@@ -12,13 +12,6 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 
 from browser_env.env_config import config as browse_config
-# (
-#     ACCOUNTS,
-#     CLASSIFIEDS,
-#     REDDIT,
-#     SHOPPING,
-#     OPENTABLE
-# )
 
 def is_expired(
     storage_state: Path, url: str, keyword: str, url_exact: bool = True
