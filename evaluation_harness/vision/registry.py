@@ -18,7 +18,7 @@ class Registry:
         else:
             raise KeyError(f"No evaluator registered under the name '{name}'.")
 
-pipeline_registry = Registry()d
+pipeline_registry = Registry()
 
 
 class EvaluatorRegistry(dict):

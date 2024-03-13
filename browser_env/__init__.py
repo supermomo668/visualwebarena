@@ -33,7 +33,7 @@ from .actions import (
 )
 from .async_envs import AsyncScriptBrowserEnv
 from .envs import ScriptBrowserEnv
-from .processors import ObservationMetadata
+from .processors.base import ObservationMetadata
 from .trajectory import Trajectory
 from .utils import DetachedPage, StateInfo
 

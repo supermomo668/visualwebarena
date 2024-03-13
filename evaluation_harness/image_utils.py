@@ -7,21 +7,26 @@ from transformers import (
     Blip2ForConditionalGeneration,
     Blip2Processor,
 )
-
+from evaluation_harness.vision import GPTVVisionAPIPipeline
 
 def get_captioning_fn(
     device, dtype, model_name: str = "Salesforce/blip2-flan-t5-xl"
 ) -> callable:
-    if "blip2" in model_name:
-        captioning_processor = Blip2Processor.from_pretrained(model_name)
-        captioning_model = Blip2ForConditionalGeneration.from_pretrained(
-            model_name, torch_dtype=dtype
-        )
+    if model_name.lower().starstwith("api"):
+        from openai import OpenAIImageCaptioningAPI
+        captioning_api = OpenAIImageCaptioningAPI()
     else:
-        raise NotImplementedError(
-            "Only BLIP-2 models are currently supported"
-        )
-    captioning_model.to(device)
+        
+        if "blip2" in model_name:
+            captioning_processor = Blip2Processor.from_pretrained(model_name)
+            captioning_model = Blip2ForConditionalGeneration.from_pretrained(
+                model_name, torch_dtype=dtype
+            )
+        else:
+            raise NotImplementedError(
+                "Only BLIP-2 models are currently supported"
+            )
+        captioning_model.to(device)
 
     def caption_images(
         images: List[Image.Image],

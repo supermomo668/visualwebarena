@@ -12,10 +12,11 @@ from playwright.sync_api import CDPSession, Page, ViewportSize
 from browser_env.constants import IGNORED_ACTREE_PROPERTIES
 from browser_env.processors.base import ObservationProcessor
 from browser_env.processors.utils import create_empty_metadata, remove_unicode
-from . import AccessibilityTree
-from . import IGNORED_ACTREE_PROPERTIES
-
-from . import BrowserConfig, BrowserInfo, Observation
+from .base import AccessibilityTree
+from .base import (
+    IGNORED_ACTREE_PROPERTIES, 
+    BrowserConfig, BrowserInfo
+)
 
 class TextObervationProcessor(ObservationProcessor):
     def __init__(

@@ -14,9 +14,9 @@ from beartype import beartype
 from gymnasium import spaces
 from PIL import Image, ImageDraw, ImageFont
 
-from . import BrowserInfo, BrowserConfig, png_bytes_to_numpy
+from .base import BrowserInfo, BrowserConfig, png_bytes_to_numpy
 
-from browser_env.processors.base import ObservationProcessor, ObservationMetadata
+from browser_env.processors.base import ObservationProcessor
 from browser_env.processors.utils import create_empty_metadata
 
 

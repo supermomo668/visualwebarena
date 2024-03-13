@@ -1,23 +1,26 @@
 
-from typing import Any, Optional, TypedDict, Union
-
+from typing import Any, TypedDict
 import numpy as np
 
 from beartype import beartype
 from gymnasium import spaces
 from playwright.sync_api import CDPSession, Page, ViewportSize
 
+from ..utils import (
+  AccessibilityTree,
+  BrowserConfig,
+  BrowserInfo,
+  Observation,
+  png_bytes_to_numpy,
+)
 
 from typing import TypedDict, Any
-from . import Observation
 from . import  (
     ASCII_CHARSET,
     FREQ_UNICODE_CHARSET,
     IGNORED_ACTREE_PROPERTIES,
     UTTERANCE_MAX_LENGTH,
 )
-from .image import ImageObservationProcessor
-from .text import TextObervationProcessor
 
 class ObservationProcessor:
     def process(self, page: Page, client: CDPSession) -> Observation:
@@ -27,6 +30,10 @@ class ObservationProcessor:
 class ObservationMetadata(TypedDict):
     obs_nodes_info: dict[str, Any]
     
+
+from .image import ImageObservationProcessor
+from .text import TextObervationProcessor
+
 class ObservationHandler:
     """Main entry point to access all observation processor"""
 

@@ -11,7 +11,6 @@ def remove_unicode(input_string):
     return cleaned_string
 
 
-
 def create_empty_metadata() -> ObservationMetadata:
     return {
         "obs_nodes_info": {},

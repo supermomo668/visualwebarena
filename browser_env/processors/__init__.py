@@ -1,16 +1,3 @@
-
-
-from .image import ImageObservationProcessor
-from .text import TextObervationProcessor
-
-from ..utils import (
-  AccessibilityTree,
-  BrowserConfig,
-  BrowserInfo,
-  Observation,
-  png_bytes_to_numpy,
-)
-
 from browser_env.constants import (
     ASCII_CHARSET,
     FREQ_UNICODE_CHARSET,
@@ -18,7 +5,11 @@ from browser_env.constants import (
     UTTERANCE_MAX_LENGTH,
 )
 
+from .base import ObservationHandler, TextObervationProcessor, ImageObservationProcessor
+
 
 __all__ = [
-  "ImageObservationProcessor", "TextObervationProcessor"
+  ObservationHandler,
+  TextObervationProcessor,
+  ImageObservationProcessor
 ]
