@@ -2,18 +2,20 @@ import base64
 import requests
 import re
 import os
+import io
 from urllib.parse import urlparse
 import mimetypes
 
-from .base import Pipeline
-
 from openai import OpenAI
+from PIL import Image
+
+from .base import Pipeline
 
 client = OpenAI()
 
 
 class GPTVVisionAPIPipeline(Pipeline):
-    def __init__(self):
+    def __init__(self, model="gpt-4-vision-preview", max_tokens=300):
         try:
             self.api_key = os.environ["OPENAI_API_KEY"]
         except KeyError:
@@ -24,6 +26,7 @@ class GPTVVisionAPIPipeline(Pipeline):
             "Content-Type": "application/json",
             "Authorization": f"Bearer {self.api_key}",
         }
+        self.model="gpt-4-vision-preview"
         self.api_url = "https://api.openai.com/v1/chat/completions"
 
     @staticmethod
@@ -45,45 +48,40 @@ class GPTVVisionAPIPipeline(Pipeline):
             return False
 
     @staticmethod
-    def encode_image(self, image_path):
-        with open(image_path, "rb") as image_file:
-            return base64.b64encode(image_file.read()).decode("utf-8")
-
-    def process_image(self, image_input):
-        if self.is_url(image_input):
-            image_content = {"type": "image_url", "image_url": {"url": image_input}}
-        elif self.is_base64(image_input):
-            mime_type, _ = mimetypes.guess_type(image_input[:30])
-            # Guess mime type from base64
-            image_content = {
-                "type": "image_url",
-                "image_url": {"url": f"data:{mime_type};base64,{image_input}"},
-            }
+    def encode_image(self, image_input):
+        if isinstance(image_input, str) and (self.is_url(image_input) or self.is_base64(image_input)):
+            return image_input
+        elif isinstance(image_input, Image.Image):
+            buffered = io.BytesIO()
+            image_input.save(buffered, format="JPEG")
+            return base64.b64encode(buffered.getvalue()).decode('utf-8')
         else:
-            try:
-                base64_image = self.encode_image(image_input)
-                mime_type, _ = mimetypes.guess_type(image_input)
-                image_content = {
-                    "type": "image_url",
-                    "image_url": {"url": f"data:{mime_type};base64,{base64_image}"},
-                }
-            except FileNotFoundError:
-                print(f"Error: File not found - {image_input}")
-                return
-        return image_content
+            raise ValueError("Unsupported image input type")
 
-    def generate_caption(self, text, image_input):
-        image_content = self.process_image()
+    def process_image(self, text, image_input):
+        if not isinstance(images, list):
+            images = [images]
+            
+        image_contents = []
+        for image in images:
+            encoded_image = self.encode_image(image)
+            if self.is_url(encoded_image):
+                image_content = {"type": "image_url", "image_url": {"url": encoded_image}}
+            else:
+                mime_type, _ = mimetypes.guess_type(image[:30]) if isinstance(image, str) else ("image/jpeg", None)
+                image_content = {"type": "image_url", "image_url": {"url": f"data:{mime_type};base64,{encoded_image}"}}
+            image_contents.append(image_content)
+        return image_contents
+    
+    def generate_caption(self, text, images):
+        image_content = self.process_image(
+            text, images)
         payload = {
-            "model": "gpt-4-vision-preview",
-            "messages": [
-                {
-                    "role": "user",
-                    "content": [{"type": "text", "text": text}, image_content],
-                }
-            ],
-            "max_tokens": 300,
+            "model": self.model,
+            "messages": [{"role": "user", "content": image_content}],
+            "max_tokens": self.max_tokens
         }
+
 
         response = requests.post(self.api_url, headers=self.headers, json=payload)
         try:
@@ -91,8 +89,9 @@ class GPTVVisionAPIPipeline(Pipeline):
             return response.json()
         except requests.exceptions.HTTPError as e:
             print(f"Request failed: {e}")
+            
 
-
+                
 if __name__ == "__main__":
     """
     python -m visualwebarena.evaluation_harness.vision.openai

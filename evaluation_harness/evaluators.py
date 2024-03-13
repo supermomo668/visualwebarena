@@ -44,6 +44,8 @@ from evaluation_harness.helper_functions import (
     shopping_get_sku_latest_review_text,
 )
 
+from .constants import USER_AGENT_HEADERS
+
 Trajectory = list[Union[Action, StateInfo]]
 
 
@@ -549,7 +551,8 @@ class PageImageEvaluator(Evaluator):
                     ):
                         image_url = urljoin(page.url, image_url)
                     image = Image.open(
-                        requests.get(image_url, stream=True).raw
+                        requests.get(
+                            image_url, headers=USER_AGENT_HEADERS, stream=True).raw
                     )
                     all_image_pixels.append(image)
                 except Exception as e:
