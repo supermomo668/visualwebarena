@@ -623,7 +623,8 @@ class EvaluatorComb:
 
         score = 1.0
         for evaluator in self.evaluators:
-            cur_score = evaluator(trajectory, config_file, page, client)
+            cur_score = evaluator(
+                trajectory, config_file, page, client)
             score *= cur_score
 
         return score

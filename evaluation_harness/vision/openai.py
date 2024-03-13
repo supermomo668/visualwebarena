@@ -2,16 +2,14 @@ import base64
 import requests
 import re
 import os
+from urllib.parse import urlparse
+import mimetypes
 
 from .base import Pipeline
 
 from openai import OpenAI
 
 client = OpenAI()
-import base64
-import requests
-from urllib.parse import urlparse
-import mimetypes
 
 
 class GPTVVisionAPIPipeline(Pipeline):
