@@ -36,7 +36,8 @@ from browser_env.helper_functions import (
     RenderHelper,
     get_action_description,
 )
-from evaluation_harness import evaluator_router, image_utils
+from evaluation_harness import image_utils
+from evaluation_harness.evaluators import evaluator_router
 
 LOG_FOLDER = "log_files"
 Path(LOG_FOLDER).mkdir(parents=True, exist_ok=True)

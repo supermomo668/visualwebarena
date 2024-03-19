@@ -82,7 +82,6 @@ class GPTVVisionAPIPipeline(Pipeline):
             "max_tokens": self.max_tokens
         }
 
-
         response = requests.post(self.api_url, headers=self.headers, json=payload)
         try:
             response.raise_for_status()

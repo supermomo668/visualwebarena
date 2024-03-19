@@ -18,7 +18,6 @@ from evaluation_harness import (
     PageImageEvaluator,
     StringEvaluator,
     URLExactEvaluator,
-    image_utils,
 )
 from evaluation_harness.evaluators import EvaluatorComb
 
