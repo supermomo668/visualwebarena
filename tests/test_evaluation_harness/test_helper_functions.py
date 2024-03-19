@@ -2,7 +2,7 @@ import json
 import os
 
 from browser_env import ScriptBrowserEnv
-from browser_env.env_config import *
+from browser_env.env_config import config as browse_config
 from evaluation_harness.helper_functions import (
     get_query_text,
     get_query_text_lowercase,
@@ -33,14 +33,14 @@ def test_shopping_get_attributes(
     with open(config_file, "w") as f:
         json.dump({"storage_state": ".auth/shopping_state.json"}, f)
     env.reset(options={"config_file": config_file})
-    env.page.goto(f"{SHOPPING}/nec-np4100-6200-lumen-xga-dlp-projector.html")
+    env.page.goto(f"{browse_config.params.sites.SHOPPING.token}/nec-np4100-6200-lumen-xga-dlp-projector.html")
     manufacturer = shopping_get_product_attributes(
         env.page, "manufacturer |OR| brand name"
     )
 
     env.reset(options={"config_file": config_file})
     env.page.goto(
-        f"{SHOPPING}/lg-50nano80upa-50-nanocell-4k-nano80-series-smart-ultra-hd-tv-with-an-lg-sn6y-3-1-channel-dts-virtual-high-resolution-soundbar-and-subwoofer-2021.html"
+        f"{browse_config.params.sites.SHOPPING.token}/lg-50nano80upa-50-nanocell-4k-nano80-series-smart-ultra-hd-tv-with-an-lg-sn6y-3-1-channel-dts-virtual-high-resolution-soundbar-and-subwoofer-2021.html"
     )
     brand_name = shopping_get_product_attributes(
         env.page, "manufacturer |OR| brand name"
@@ -62,7 +62,7 @@ def test_get_query_text(
         json.dump({"storage_state": ".auth/shopping_state.json"}, f)
     env.reset(options={"config_file": config_file})
     env.page.goto(
-        f"{SHOPPING}/la-guapa-virtual-projection-keyboard-laser-projection-bluetooth-wireless-keyboard-for-smart-phone-pc-tablet-laptop-wireless-laser-projection-keyboard-silver.html"
+        f"{browse_config.params.sites.SHOPPING.token}/la-guapa-virtual-projection-keyboard-laser-projection-bluetooth-wireless-keyboard-for-smart-phone-pc-tablet-laptop-wireless-laser-projection-keyboard-silver.html"
     )
     query_text = get_query_text(
         env.page, "#maincontent > div.page-title-wrapper.product > h1 > span"
@@ -88,12 +88,12 @@ def test_get_product_price(
         json.dump({"storage_state": ".auth/shopping_state.json"}, f)
     env.reset(options={"config_file": config_file})
     env.page.goto(
-        f"{SHOPPING}/la-guapa-virtual-projection-keyboard-laser-projection-bluetooth-wireless-keyboard-for-smart-phone-pc-tablet-laptop-wireless-laser-projection-keyboard-silver.html"
+        f"{browse_config.params.sites.SHOPPING.token}/la-guapa-virtual-projection-keyboard-laser-projection-bluetooth-wireless-keyboard-for-smart-phone-pc-tablet-laptop-wireless-laser-projection-keyboard-silver.html"
     )
     product_price = shopping_get_product_price(env.page)
     assert product_price == 26.99
 
-    env.page.goto(f"{SHOPPING}")
+    env.page.goto(f"{browse_config.params.sites.SHOPPING.token}")
     product_price = shopping_get_product_price(env.page)
     assert product_price == 0
 
@@ -111,7 +111,7 @@ def test_get_num_reviews(
         json.dump({"storage_state": ".auth/shopping_state.json"}, f)
     env.reset(options={"config_file": config_file})
     env.page.goto(
-        f"{SHOPPING}/la-guapa-virtual-projection-keyboard-laser-projection-bluetooth-wireless-keyboard-for-smart-phone-pc-tablet-laptop-wireless-laser-projection-keyboard-silver.html"
+        f"{browse_config.params.sites.SHOPPING.token}/la-guapa-virtual-projection-keyboard-laser-projection-bluetooth-wireless-keyboard-for-smart-phone-pc-tablet-laptop-wireless-laser-projection-keyboard-silver.html"
     )
     product_reviews = shopping_get_num_reviews(env.page)
     assert product_reviews == 12
@@ -131,12 +131,12 @@ def test_get_product_rating(
         json.dump({"storage_state": ".auth/shopping_state.json"}, f)
     env.reset(options={"config_file": config_file})
     env.page.goto(
-        f"{SHOPPING}/v8-energy-healthy-energy-drink-steady-energy-from-black-and-green-tea-pomegranate-blueberry-8-ounce-can-pack-of-24.html"
+        f"{browse_config.params.sites.SHOPPING.token}/v8-energy-healthy-energy-drink-steady-energy-from-black-and-green-tea-pomegranate-blueberry-8-ounce-can-pack-of-24.html"
     )
     product_rating = shopping_get_rating_as_percentage(env.page)
     assert product_rating == 57
 
-    env.page.goto(f"{SHOPPING}/catalogsearch/advanced/")
+    env.page.goto(f"{browse_config.params.sites.SHOPPING.token}/catalogsearch/advanced/")
     product_rating = shopping_get_rating_as_percentage(env.page)
     assert product_rating == 0
     # remove tmp config file
@@ -146,7 +146,7 @@ def test_get_product_rating(
 def test_shopping_get_sku_product_page_url(
     script_browser_env: ScriptBrowserEnv,
 ) -> None:
-    true_url = f"{SHOPPING}/xbox-wireless-controller-phantom-white-special-edition.html"
+    true_url = f"{browse_config.params.sites.SHOPPING.token}/xbox-wireless-controller-phantom-white-special-edition.html"
     url = shopping_get_sku_product_page_url("B07P3L5GMW")
 
     assert url == true_url
@@ -198,7 +198,7 @@ def test_shopping_get_order_product_quantity(
     with open(config_file, "w") as f:
         json.dump({"storage_state": ".auth/shopping_state.json"}, f)
     env.reset(options={"config_file": config_file})
-    env.page.goto(f"{SHOPPING}/sales/order/view/order_id/170/")
+    env.page.goto(f"{browse_config.params.sites.SHOPPING.token}/sales/order/view/order_id/170/")
 
     quantity = shopping_get_order_product_quantity(env.page, "B087QSCXGT")
     assert quantity == 1
@@ -222,7 +222,7 @@ def test_shopping_get_order_product_option(
     with open(config_file, "w") as f:
         json.dump({"storage_state": ".auth/shopping_state.json"}, f)
     env.reset(options={"config_file": config_file})
-    env.page.goto(f"{SHOPPING}/sales/order/view/order_id/170/")
+    env.page.goto(f"{browse_config.params.sites.SHOPPING.token}/sales/order/view/order_id/170/")
 
     option = shopping_get_order_product_option(env.page, "B09LQTV3RX", "Color")
     assert option == "Blue"
@@ -243,7 +243,7 @@ def test_reddit_get_latest_comment_content_by_username(
     with open(config_file, "w") as f:
         json.dump({"storage_state": ".auth/reddit_state.json"}, f)
     env.reset(options={"config_file": config_file})
-    env.page.goto(f"{REDDIT}/f/AskReddit/116809")
+    env.page.goto(f"{browse_config.params.sites.REDDIT.token}/f/AskReddit/116809")
 
     comment_content = reddit_get_latest_comment_content_by_username(
         env.page, "DavosLostFingers"
@@ -263,7 +263,7 @@ def test_reddit_get_parent_comment_username_of_latest_comment_by_username(
     with open(config_file, "w") as f:
         json.dump({"storage_state": ".auth/reddit_state.json"}, f)
     env.reset(options={"config_file": config_file})
-    env.page.goto(f"{REDDIT}/f/memes/127590")
+    env.page.goto(f"{browse_config.params.sites.REDDIT.token}/f/memes/127590")
 
     comment_content = (
         reddit_get_parent_comment_username_of_latest_comment_by_username(

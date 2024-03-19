@@ -26,10 +26,20 @@ with open('init_browser_conf.yaml', 'r') as file:
 
 # Parse the processed data into the Config model
 try:
-    config = Config(**config_data)
+    config: Config = Config(**config_data)
 except ValidationError as e:
     print(e)
     print("Please adjust your models restrictions in model.py or update your configuration")
+"""
+config as a pydantic Config object for automatic configuration validation:
+e.g.
+    browse_config
+        > params
+            >sites
+                >SHOPPING
+                    >token 
+    you may access with `browse_config.params.sites.SHOPPING.token`
+"""
 
 if __name__=="__main__":
     print(config)

@@ -12,7 +12,7 @@ from py import test
 
 from agent import Agent, TeacherForcingAgent
 from browser_env import ActionTypes, ScriptBrowserEnv
-from browser_env.env_config import *
+from browser_env.env_config import browse_config
 from evaluation_harness import (
     HTMLContentExactEvaluator,
     PageImageEvaluator,
@@ -114,7 +114,7 @@ def test_url_exact_match_fail(script_browser_env: ScriptBrowserEnv) -> None:
 
     agent = TeacherForcingAgent()
     agent.set_action_set_tag(tag="playwright")
-    action_seq = f"""page.goto("{CLASSIFIEDS}")
+    action_seq = f"""page.goto("{browse_config.params.sites.CLASSIFIEDS.token}")
     page.stop()"""
     agent.set_actions(action_seq)
 
@@ -304,7 +304,7 @@ def test_func_url_func_last_success(
 
     agent = TeacherForcingAgent()
     agent.set_action_set_tag(tag="playwright")
-    action_seq = f"""page.goto("{REDDIT}/f/wallstreetbets/50431/-/comment/676875")
+    action_seq = f"""page.goto("{browse_config.params.sites.REDDIT.token}/f/wallstreetbets/50431/-/comment/676875")
     page.stop()"""
     agent.set_actions(action_seq)
 
@@ -329,7 +329,7 @@ def test_html_required_values_success(
             configs = json.load(f)
             configs["eval"]["reference_url"] = configs["eval"][
                 "reference_url"
-            ].replace("__SHOPPING__", SHOPPING)
+            ].replace("__SHOPPING__", browse_config.params.sites.SHOPPING.token)
         tmp_config = config_file.replace(".json", ".json.tmp")
         with open(tmp_config, "w+") as f:
             json.dump(configs, f, indent=4)
@@ -366,12 +366,12 @@ def test_page_image_evaluator(
             configs = json.load(f)
             configs["eval"]["reference_url"] = configs["eval"][
                 "reference_url"
-            ].replace("__SHOPPING__", SHOPPING)
+            ].replace("__SHOPPING__", browse_config.params.sites.SHOPPING.token)
             configs["start_url"] = configs["start_url"].replace(
-                "__SHOPPING__", SHOPPING
+                "__SHOPPING__", browse_config.params.sites.SHOPPING.token
             )
             for e in configs["eval"]["page_image_query"]:
-                e["eval_image_url"] = e["eval_image_url"].replace("__SHOPPING__", SHOPPING)
+                e["eval_image_url"] = e["eval_image_url"].replace("__SHOPPING__", browse_config.params.sites.SHOPPING.token)
         tmp_config = config_file.replace(".json", ".json.tmp")
         with open(tmp_config, "w+") as f:
             json.dump(configs, f, indent=4)
@@ -415,12 +415,12 @@ def test_page_image_evaluator_yes_no(
         configs = json.load(f)
         configs["eval"]["reference_url"] = configs["eval"][
             "reference_url"
-        ].replace("__SHOPPING__", SHOPPING)
+        ].replace("__SHOPPING__", browse_config.params.sites.SHOPPING.token)
         configs["start_url"] = configs["start_url"].replace(
-            "__SHOPPING__", SHOPPING
+            "__SHOPPING__", browse_config.params.sites.SHOPPING.token
         )
         for e in configs["eval"]["page_image_query"]:
-            e["eval_image_url"] = e["eval_image_url"].replace("__SHOPPING__", SHOPPING)
+            e["eval_image_url"] = e["eval_image_url"].replace("__SHOPPING__", browse_config.params.sites.SHOPPING.token)
     tmp_config = config_file.replace(".json", ".json.tmp")
     with open(tmp_config, "w+") as f:
         json.dump(configs, f, indent=4)
@@ -457,7 +457,7 @@ def test_html_required_values_failure(
             configs = json.load(f)
             configs["eval"]["reference_url"] = configs["eval"][
                 "reference_url"
-            ].replace("__SHOPPING__", SHOPPING)
+            ].replace("__SHOPPING__", browse_config.params.sites.SHOPPING.token)
         tmp_config = config_file.replace(".json", ".json.tmp")
         with open(tmp_config, "w+") as f:
             json.dump(configs, f, indent=4)
@@ -498,16 +498,16 @@ def test_exact_image(
         with open(config_file, "r") as f:
             configs = json.load(f)
             configs["start_url"] = configs["start_url"].replace(
-                "__REDDIT__", REDDIT
+                "__REDDIT__", browse_config.params.sites.REDDIT.token
             )
             configs["eval"]["reference_url"] = configs["eval"][
                 "reference_url"
-            ].replace("__REDDIT__", REDDIT)
+            ].replace("__REDDIT__", browse_config.params.sites.REDDIT.token)
 
             for e in configs["eval"]["page_image_query"]:
-                e["eval_fuzzy_image_match"] = e["eval_fuzzy_image_match"].replace("__REDDIT__", REDDIT)
-            configs["image"] = configs["image"].replace("__REDDIT__", REDDIT)
-            configs["intent"] = configs["intent"].replace("__REDDIT__", REDDIT)
+                e["eval_fuzzy_image_match"] = e["eval_fuzzy_image_match"].replace("__REDDIT__", browse_config.params.sites.REDDIT.token)
+            configs["image"] = configs["image"].replace("__REDDIT__", browse_config.params.sites.REDDIT.token)
+            configs["intent"] = configs["intent"].replace("__REDDIT__", browse_config.params.sites.REDDIT.token)
         tmp_config = config_file.replace(".json", ".tmp.json")
         with open(tmp_config, "w+") as f:
             json.dump(configs, f, indent=4)
@@ -545,19 +545,19 @@ def test_exact_image_resize_success(
         with open(config_file, "r") as f:
             configs = json.load(f)
             configs["start_url"] = configs["start_url"].replace(
-                "__REDDIT__", REDDIT
+                "__REDDIT__", browse_config.params.sites.REDDIT.token
             )
             configs["eval"]["reference_url"] = configs["eval"][
                 "reference_url"
-            ].replace("__REDDIT__", REDDIT)
+            ].replace("__REDDIT__", browse_config.params.sites.REDDIT.token)
             for e in configs["eval"]["page_image_query"]:
-                e["eval_fuzzy_image_match"] = e["eval_fuzzy_image_match"].replace("__REDDIT__", REDDIT)
-            configs["image"] = configs["image"].replace("__REDDIT__", REDDIT)
-            configs["intent"] = configs["intent"].replace("__REDDIT__", REDDIT)
+                e["eval_fuzzy_image_match"] = e["eval_fuzzy_image_match"].replace("__REDDIT__", browse_config.params.sites.REDDIT.token)
+            configs["image"] = configs["image"].replace("__REDDIT__", browse_config.params.sites.REDDIT.token)
+            configs["intent"] = configs["intent"].replace("__REDDIT__", browse_config.params.sites.REDDIT.token)
 
             # Download an image and resize
             img_url = configs["instantiation_dict"]["image_url"].replace(
-                "__REDDIT__", REDDIT
+                "__REDDIT__", browse_config.params.sites.REDDIT.token
             )
             img = Image.open(requests.get(img_url, stream=True).raw)
             # Resize image to half its size
