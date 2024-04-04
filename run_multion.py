@@ -40,7 +40,7 @@ from browser_env.helper_functions import (
     get_action_description,
 )
 from evaluation_harness import image_utils
-from evaluation_harness.multion_evaluators import evaluator_router
+from evaluation_harness.evaluators.multion import evaluator_router
 
 
 LOG_FOLDER = "log_files"
@@ -63,8 +63,8 @@ formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
 console_handler.setFormatter(formatter)
 file_handler.setFormatter(formatter)
 
-multion_api_key = os.getenv('MULTION_API_KEY')
-multion.login(use_api=True, multion_api_key=multion_api_key)
+multion.login(
+    use_api=True, multion_api_key=os.getenv('MULTION_API_KEY'))
 multion.set_remote(True)
 
 
@@ -339,7 +339,6 @@ def test(
                 task_id = _c["task_id"]
                 image_paths = _c.get("image", None)
                 images = []
-
                 # Load input images for the task, if any.
                 if image_paths is not None:
                     if isinstance(image_paths, str):
@@ -361,15 +360,16 @@ def test(
             if len(images) != 0:
                 print(f"Images not supported yet. Skipping [{task_id}]")
 
-            url = _c['start_url'].replace("localhost", "ec2-18-117-93-31.us-east-2.compute.amazonaws.com")
+            url = _c['start_url'].replace(
+                "localhost", os.getenv("DEFAULT_START_URL"))
             if not url.startswith('http'):
                 url = 'http://' + url
-            # url = url.replace("localhost", "ec2-18-117-93-31.us-east-2.compute.amazonaws.com")
             response = multion.create_session({'url': url})
             responses = []
             for step in range(args.max_steps):
-                response = multion.step_session(response['session_id'], {'url': url,
-                                                                         'input': intent})
+                response = multion.step_session(
+                    response['session_id'], 
+                    {'url': url, 'input': intent})
                 responses.append(response)
 
             # save responses
@@ -385,8 +385,9 @@ def test(
             trajectory: Trajectory = []
                        # NOTE: eval_caption_image_fn is used for running eval_vqa functions.
             evaluator = evaluator_router(
-                config_file, captioning_fn=eval_caption_image_fn
-            )
+                config_file, 
+                captioning_fn=eval_caption_image_fn
+u            )
             score = evaluator(
                 response=response,
                 config_file=config_file,

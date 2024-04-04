@@ -1,0 +1,32 @@
+
+<!DOCTYPE html>
+<head>
+    <style>
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<html>
+    <body>
+     <pre>sites: ['OpenTable']
+task_id: 0
+require_login: True
+storage_state: ./.auth/opentable_state.json
+start_url: https://www.opentable.com
+geolocation: None
+intent_template: Book a table at a {{category}} in the area {{area}} with {{reqs}}
+intent: Book a table at a Italian restaurant in the downtown area with {{reqs}}
+instantiation_dict: {'category': 'Italian', 'area': 'downtown', 'reqs': 'a good rating'}
+require_reset: False
+eval: {'eval_types': ['program_html'], 'reference_answers': None, 'reference_url': '', 'program_html': [{'url': 'func:opentable_get_reservation_confirmation()', 'locator': 'document.querySelector(".reservation-confirmation-number").innerText', 'required_contents': {'must_include': ['Confirmation Number']}}]}
+intent_template_id: 0
+reasoning_difficulty: medium
+visual_difficulty: easy
+comments: Intent focuses on finding and booking a restaurant reservation based on specific criteria.
+overall_difficulty: medium
+</pre>
+
+    </body>
+</html>

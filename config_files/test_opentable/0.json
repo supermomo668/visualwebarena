@@ -1,0 +1,41 @@
+{
+  "sites": [
+    "OpenTable"
+  ],
+  "task_id": 0,
+  "require_login": true,
+  "storage_state": "./.auth/opentable_state.json",
+  "start_url": "https://www.opentable.com",
+  "geolocation": null,
+  "intent_template": "Book a table at a {{category}} in the area {{area}} with {{reqs}}",
+  "intent": "Book a table at a Italian restaurant in the downtown area with {{reqs}}",
+  "instantiation_dict": {
+    "category": "Italian",
+    "area": "downtown",
+    "reqs": "a good rating"
+  },
+  "require_reset": false,
+  "eval": {
+    "eval_types": [
+      "program_html"
+    ],
+    "reference_answers": null,
+    "reference_url": "",
+    "program_html": [
+      {
+        "url": "func:opentable_get_reservation_confirmation()",
+        "locator": "document.querySelector(\".reservation-confirmation-number\").innerText",
+        "required_contents": {
+          "must_include": [
+            "Confirmation Number"
+          ]
+        }
+      }
+    ]
+  },
+  "intent_template_id": 0,
+  "reasoning_difficulty": "medium",
+  "visual_difficulty": "easy",
+  "comments": "Intent focuses on finding and booking a restaurant reservation based on specific criteria.",
+  "overall_difficulty": "medium"
+}

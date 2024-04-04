@@ -47,7 +47,6 @@ class Agent:
 
 class TeacherForcingAgent(Agent):
     """Agent that follows a pre-defined action sequence"""
-
     def __init__(self) -> None:
         super().__init__()
 

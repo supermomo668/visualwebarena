@@ -20,7 +20,7 @@ def replace_env_variables(data):
     return data
 
 # Load and process the YAML file
-with open('init_browser_conf.yaml', 'r') as file:
+with open('.init_browser_conf.yaml', 'r') as file:
     raw_config_data = yaml.safe_load(file)
     config_data = replace_env_variables(raw_config_data)
 

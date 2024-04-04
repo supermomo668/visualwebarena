@@ -4,16 +4,11 @@ visualwebarena:
 
 params:
   sites:
-    reddit:
-      slug: "reddit"
-      url: "http://example.com/reddit"
+    SiteA:
+      slug: "site_a"
+      url: "http://example.com/sitea"
       username: "user_example"
       password: "pass_example"
       token: "token_example"
-    shopping:
-      slug: "shopping"
-      url: "http://example.com/shopping"
-      username: "user_example"
-      password: "pass_example"
-      token: ""
+
     # Similar structure for other sites with sensitive info hidden or replaced

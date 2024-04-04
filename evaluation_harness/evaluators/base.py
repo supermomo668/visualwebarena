@@ -11,10 +11,6 @@ from evaluation_harness.helper_functions import PseudoPage
 
 from typing import Union
 
-from .string import StringEvaluator
-from .numeric import NumericEvaluator
-from .image import PageImageEvaluator
-from .url import URLExactEvaluator, HTMLContentExactEvaluator
 
 Trajectory = list[Union[Action, StateInfo]]\
 
@@ -91,11 +87,25 @@ class EvaluatorComb:
         return score
 
 
+from .string import StringEvaluator
+from .image import PageImageEvaluator
+from .url import URLExactEvaluator, HTMLContentExactEvaluator
+
 @beartype
 def evaluator_router(
     config_file: Path | str, captioning_fn=None
 ) -> EvaluatorComb:
-    """Router to get the evaluator class"""
+    """
+    Router to get the evaluator class
+    A function that routes evaluators based on config settings and returns a combined evaluator.
+
+    Parameters:
+        config_file (Path | str): The file path or string containing the config settings.
+        captioning_fn (Optional): The function used for captioning.
+
+    Returns:
+        EvaluatorComb: A combined evaluator based on the configured eval types.
+    """
     with open(config_file, "r") as f:
         configs = json.load(f)
 

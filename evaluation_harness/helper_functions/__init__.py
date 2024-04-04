@@ -4,12 +4,16 @@ from .gitlab import gitlab_get_project_memeber_role
 
 from .llm import llm_fuzzy_match, llm_ua_match
 
+from .utils import (
+  get_query_text, get_query_text_lowercase
+)
 from .reddit import (
-  get_query_text, reddit_get_latest_comment_content_by_username,
+  reddit_get_latest_comment_content_by_username,
   reddit_get_latest_comment_obj_by_username,
   reddit_get_parent_comment_username_of_latest_comment_by_username,
   reddit_get_post_comment_tree
 )
+
 from .shopping import (
   shopping_get_latest_order_url, shopping_get_num_reviews,
   shopping_get_order_product_name_list, shopping_get_order_product_option,

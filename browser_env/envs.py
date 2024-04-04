@@ -23,7 +23,7 @@ from playwright.sync_api import (
     sync_playwright,
 )
 
-from browser_env.env_config import config as browse_config 
+from .env_config import config as browse_config 
 
 from .actions import Action, execute_action, get_action_space
 from .processors.base import ObservationHandler, ObservationMetadata
