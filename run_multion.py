@@ -387,7 +387,7 @@ def test(
             evaluator = evaluator_router(
                 config_file, 
                 captioning_fn=eval_caption_image_fn
-u            )
+            )
             score = evaluator(
                 response=response,
                 config_file=config_file,
