@@ -16,7 +16,13 @@ from agent.prompts import *
 from run_utils.test import test
 from run_utils.initialize import prepare, config
 
-from run_utils.logging import logger    
+from run_utils.logging import logger
+
+from dotenv import load_dotenv
+
+load_envvar = load_dotenv()
+assert load_envvar, "Env vars not loaded"
+assert os.environ['OPENAI_API_KEY'], "OpenAI key not loaded"
 
 def get_unfinished(config_files: list[str], result_dir: str) -> list[str]:
     result_files = glob.glob(f"{result_dir}/*.html")
@@ -56,6 +62,7 @@ if __name__ == "__main__":
     # get remaining tasks based on  
     test_file_list = get_unfinished(test_file_list, args.result_dir)
     print(f"Total {len(test_file_list)} tasks left")
+    
     args.render = False
     args.render_screenshot = True
     args.save_trace_enabled = True

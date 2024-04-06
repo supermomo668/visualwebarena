@@ -27,6 +27,8 @@ with open('.init_browser_conf.yaml', 'r') as file:
 # Parse the processed data into the Config model
 try:
     config: Config = Config(**config_data)
+    print("Configuration:")
+    print(config)
 except ValidationError as e:
     print(e)
     print("Please adjust your models restrictions in model.py or update your configuration")

@@ -86,6 +86,7 @@ def test(
             "width": args.viewport_width,
             "height": args.viewport_height,
         },
+        
         save_trace_enabled=args.save_trace_enabled,
         sleep_after_execution=args.sleep_after_execution,
         # NOTE: captioning_fn here is used for LLM + captioning baselines.

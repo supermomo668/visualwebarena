@@ -117,7 +117,7 @@ def shopping_get_sku_latest_review_title(sku: str) -> str:
     response = requests.get(
         f"{browse_config.params.sites.SHOPPING.token}/rest/V1/products/{sku}/reviews", headers=header
     )
-    assert response.status_code == 200
+    assert response.status_code == 200  
     response_obj = response.json()
     if len(response_obj) == 0:
         return ""

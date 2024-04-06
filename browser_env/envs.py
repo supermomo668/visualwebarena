@@ -22,6 +22,7 @@ from playwright.sync_api import (
     expect,
     sync_playwright,
 )
+from evaluation_harness.constants import USER_AGENT_HEADERS
 
 from .env_config import config as browse_config 
 
@@ -139,7 +140,8 @@ class ScriptBrowserEnv(Env[dict[str, Observation], Action]):
             self.playwright = self.context_manager.__enter__()
             self.browser = self.playwright.chromium.launch(
                 headless=self.headless, 
-                slow_mo=self.slow_mo
+                slow_mo=self.slow_mo,
+                args=['--disable-http2']
             )
         except Exception as e:
             raise f("Error setting up playwright browser: {e}")
@@ -186,6 +188,7 @@ class ScriptBrowserEnv(Env[dict[str, Observation], Action]):
             storage_state=storage_state,
             geolocation=geolocation,
             device_scale_factor=1,
+            extra_http_headers=USER_AGENT_HEADERS
         )
         if self.save_trace_enabled:
             self.context.tracing.start(screenshots=True, snapshots=True)
@@ -193,6 +196,7 @@ class ScriptBrowserEnv(Env[dict[str, Observation], Action]):
             start_urls = start_url.split(" |AND| ")
             for url in start_urls:
                 page = self.context.new_page()
+
                 client = page.context.new_cdp_session(
                     page
                 )  # talk to chrome devtools

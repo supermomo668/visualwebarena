@@ -103,7 +103,7 @@ celerybeat.pid
 
 # Environments
 .auth/
-**/*.env
+!.example.env
 .env
 .venv
 env/

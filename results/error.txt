@@ -1,0 +1,12 @@
+[Config file]: config_files/test_opentable/0.json
+[Unhandled Error] NameError("name 'opentable_get_reservation_confirmation' is not defined")
+Traceback (most recent call last):
+  File "/home/ubuntu/opentable-matt/visualwebarena/run_utils/test.py", line 189, in test
+    score = evaluator(
+  File "/home/ubuntu/opentable-matt/visualwebarena/evaluation_harness/evaluators/base.py", line 83, in __call__
+    cur_score = evaluator(
+  File "<@beartype(evaluation_harness.evaluators.url.HTMLContentExactEvaluator.__call__) at 0x7f9684971e10>", line 115, in __call__
+  File "/home/ubuntu/opentable-matt/visualwebarena/evaluation_harness/evaluators/url.py", line 74, in __call__
+    target_url = eval(func)
+  File "<string>", line 1, in <module>
+NameError: name 'opentable_get_reservation_confirmation' is not defined

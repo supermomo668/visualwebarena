@@ -12,6 +12,9 @@ import aiolimiter
 import openai
 from openai import AsyncOpenAI, OpenAI
 
+from dotenv import load_dotenv
+assert load_dotenv()
+
 client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 aclient = AsyncOpenAI(api_key=os.environ["OPENAI_API_KEY"])
 from tqdm.asyncio import tqdm_asyncio
