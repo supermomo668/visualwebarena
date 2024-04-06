@@ -33,15 +33,15 @@ def extract_reservation_info(html):
     reservation_datetime = soup.find('section', {'data-test': 'reservation-date-time'}).text.strip()
 
     # Extract user information
-    user_name = soup.find('div', {'class': '_6MqxdoCn1NE-'}).find('div', {'class': 'nLQ-7r8IvOk-'}).text.strip()
+    user_name = soup.find('div', {'class': '_6MqxdoCn1NE-'}).find(
+      'div', {'class': 'nLQ-7r8IvOk-'}).text.strip()
     user_first_name, user_last_name = user_name.split(' ')  # Assuming first and last name
-
     return (
         restaurant_name,
-        reservfrom evaluation_harness.evaluators.base import evaluator_routeration_status,
+        reservation_status,
         party_size,
         reservation_datetime,
-        user_first_name,from evaluation_harness.evaluators.base import evaluator_router
+        user_first_name,
         user_last_name,
     )
 
